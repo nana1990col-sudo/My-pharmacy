@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Daily Sales Table -->
+        <div class="col-md-7 mb-4">
+            <div class="card p-4">
+                <h5 class="card-title mb-4"><i class="fas fa-calendar-day me-2 text-primary"></i> ملخص المبيعات اليومية</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle text-center">
+                        <thead class="table-light">
+                            <tr>
+                                <th>التاريخ</th>
+                                <th>عدد العمليات</th>
+                                <th>إجمالي المبيعات</th>
+                                <th>الإجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for day_sale in sales_by_day %}
+                            <tr>
+                                <td class="fw-bold">{{ day_sale.day }}</td>
+                                <td>{{ day_sale.count }}</td>
+                                <td class="text-success fw-bold">{{ day_sale.total }} ج.م</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye me-1"></i> عرض التفاصيل
+                                    </button>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center py-4 text-muted">لا توجد مبيعات مسجلة</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Selling Drugs -->
+        <div class="col-md-5 mb-4">
+            <div class="card p-4">
+                <h5 class="card-title mb-4"><i class="fas fa-trophy me-2 text-warning"></i> الأدوية الأكثر مبيعاً</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>الدواء</th>
+                                <th class="text-center">الكمية المباعة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for drug in top_selling %}
+                            <tr>
+                                <td class="fw-bold">{{ drug.drug__trade_name }}</td>
+                                <td class="text-center">
+                                    <span class="badge bg-success rounded-pill px-3">{{ drug.total_sold }}</span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="2" class="text-center py-4 text-muted">لا توجد بيانات متاحة</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

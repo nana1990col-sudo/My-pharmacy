@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="card-title mb-0"><i class="fas fa-prescription me-2 text-primary"></i> سجل الوصفات الطبية</h5>
+            <a href="{% url 'prescription_add' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i> إضافة وصفة جديدة
+            </a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light text-center">
+                    <tr>
+                        <th>التاريخ</th>
+                        <th>المريض</th>
+                        <th>اسم الطبيب</th>
+                        <th>الحالة</th>
+                        <th>الإجراء</th>
+                    </tr>
+                </thead>
+                <tbody class="text-center">
+                    {% for prescription in prescriptions %}
+                    <tr>
+                        <td>{{ prescription.date }}</td>
+                        <td class="fw-bold">{{ prescription.patient.name }}</td>
+                        <td>{{ prescription.doctor_name }}</td>
+                        <td>
+                            {% if prescription.is_dispensed %}
+                                <span class="badge bg-success">تم الصرف</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">بانتظار الصرف</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye me-1"></i> عرض التفاصيل
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center py-4 text-muted">لا توجد وصفات مسجلة</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

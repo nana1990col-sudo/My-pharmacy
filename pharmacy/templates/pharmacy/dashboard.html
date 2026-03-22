@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Statistics Cards -->
+        <div class="col-md-3 mb-4">
+            <div class="card stat-card bg-primary text-white p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3>{{ total_drugs }}</h3>
+                        <p class="mb-0">إجمالي الأدوية</p>
+                    </div>
+                    <i class="fas fa-pills fa-2x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card stat-card bg-success text-white p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3>{{ today_revenue }} ج.م</h3>
+                        <p class="mb-0">مبيعات اليوم</p>
+                    </div>
+                    <i class="fas fa-money-bill-wave fa-2x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card stat-card bg-warning text-dark p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3>{{ low_stock_count }}</h3>
+                        <p class="mb-0">أدوية منخفضة المخزون</p>
+                    </div>
+                    <i class="fas fa-exclamation-triangle fa-2x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card stat-card bg-danger text-white p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3>{{ expired_count }}</h3>
+                        <p class="mb-0">أدوية منتهية الصلاحية</p>
+                    </div>
+                    <i class="fas fa-calendar-times fa-2x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Low Stock Table -->
+        <div class="col-md-6 mb-4">
+            <div class="card p-4">
+                <h5 class="card-title mb-4"><i class="fas fa-box-open me-2 text-warning"></i> تنبيهات نقص المخزون</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>الدواء</th>
+                                <th>الكمية</th>
+                                <th>الحد الأدنى</th>
+                                <th>الإجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for drug in low_stock_drugs %}
+                            <tr>
+                                <td>{{ drug.trade_name }}</td>
+                                <td class="text-danger fw-bold">{{ drug.quantity }}</td>
+                                <td>{{ drug.min_stock_level }}</td>
+                                <td><a href="{% url 'drug_edit' drug.id %}" class="btn btn-sm btn-outline-primary">تعديل</a></td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center">لا يوجد نقص حالياً</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Near Expiry Table -->
+        <div class="col-md-6 mb-4">
+            <div class="card p-4">
+                <h5 class="card-title mb-4"><i class="fas fa-hourglass-half me-2 text-danger"></i> أدوية تقترب من الانتهاء</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>الدواء</th>
+                                <th>تاريخ الانتهاء</th>
+                                <th>الكمية</th>
+                                <th>الإجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for drug in near_expiry_drugs %}
+                            <tr>
+                                <td>{{ drug.trade_name }}</td>
+                                <td class="text-danger fw-bold">{{ drug.expiry_date }}</td>
+                                <td>{{ drug.quantity }}</td>
+                                <td><a href="{% url 'drug_edit' drug.id %}" class="btn btn-sm btn-outline-primary">تعديل</a></td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center">لا توجد أدوية قريبة من الانتهاء</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

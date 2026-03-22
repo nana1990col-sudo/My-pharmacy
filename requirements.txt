@@ -1,0 +1,9 @@
+django
+django-crispy-forms
+crispy-bootstrap5
+django-widget-tweaks
+pillow
+django-import-export
+django-allauth
+gunicorn
+whitenoise

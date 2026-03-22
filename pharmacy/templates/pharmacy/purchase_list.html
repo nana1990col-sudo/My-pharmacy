@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="card-title mb-0"><i class="fas fa-boxes me-2 text-primary"></i> سجل المشتريات (التوريد)</h5>
+            <a href="{% url 'purchase_add' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i> تسجيل توريد جديد
+            </a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light text-center">
+                    <tr>
+                        <th>التاريخ</th>
+                        <th>المورد</th>
+                        <th>الدواء</th>
+                        <th>الكمية</th>
+                        <th>التكلفة للوحدة</th>
+                        <th>الإجمالي</th>
+                    </tr>
+                </thead>
+                <tbody class="text-center">
+                    {% for purchase in purchases %}
+                    <tr>
+                        <td>{{ purchase.date }}</td>
+                        <td class="fw-bold text-primary">{{ purchase.supplier.name }}</td>
+                        <td>{{ purchase.drug.trade_name }}</td>
+                        <td class="fw-bold">{{ purchase.quantity }}</td>
+                        <td>{{ purchase.unit_cost }} ج.م</td>
+                        <td class="text-danger fw-bold">{{ purchase.total_cost }} ج.م</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center py-4 text-muted">لا توجد عمليات توريد مسجلة</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
