@@ -1,5 +1,6 @@
 from django import forms
-from .models import Drug, Category, Supplier, Patient, Prescription, Sale, SaleItem, Purchase
+from .models import Drug, Category, Supplier, Patient, Prescription, PrescriptionItem, Sale, SaleItem, Purchase, SystemSettings
+from django.forms import inlineformset_factory
 
 class DrugForm(forms.ModelForm):
     class Meta:
@@ -39,3 +40,15 @@ class PurchaseForm(forms.ModelForm):
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
         }
+
+class SystemSettingsForm(forms.ModelForm):
+    class Meta:
+        model = SystemSettings
+        fields = '__all__'
+
+PrescriptionItemFormSet = inlineformset_factory(
+    Prescription, PrescriptionItem,
+    fields=('drug', 'quantity'),
+    extra=1,
+    can_delete=True
+)

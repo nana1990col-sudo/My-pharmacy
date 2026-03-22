@@ -41,7 +41,7 @@
                         <td><code>{{ drug.barcode }}</code></td>
                         <td>{{ drug.category.name|default:"-" }}</td>
                         <td>{{ drug.get_form_display }}</td>
-                        <td>{{ drug.sell_price }} ج.م</td>
+                        <td>{{ drug.sell_price }} {{ system_settings.currency_unit }}</td>
                         <td class="{% if drug.is_low_stock %}text-danger fw-bold{% endif %}">
                             {{ drug.quantity }}
                         </td>

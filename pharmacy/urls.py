@@ -25,6 +25,9 @@ urlpatterns = [
     
     # Patients & Prescriptions
     path('patients/', views.patient_list, name='patient_list'),
+    path('patients/add/', views.patient_add, name='patient_add'),
     path('prescriptions/', views.prescription_list, name='prescription_list'),
     path('prescriptions/add/', views.prescription_add, name='prescription_add'),
+    # Settings
+    path('settings/', views.system_settings_view, name='system_settings'),
 ]

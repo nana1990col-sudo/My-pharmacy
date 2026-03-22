@@ -76,6 +76,8 @@
         <a href="{% url 'pos_view' %}" class="{% if request.resolver_match.url_name == 'pos_view' %}active{% endif %}">
             <i class="fas fa-cash-register me-2"></i> نقطة البيع (POS)
         </a>
+        
+        {% if user.profile.role == 'Admin' or user.profile.role == 'Pharmacist' %}
         <a href="{% url 'drug_list' %}" class="{% if request.resolver_match.url_name == 'drug_list' %}active{% endif %}">
             <i class="fas fa-pills me-2"></i> إدارة الأدوية
         </a>
@@ -85,15 +87,23 @@
         <a href="{% url 'purchase_list' %}" class="{% if request.resolver_match.url_name == 'purchase_list' %}active{% endif %}">
             <i class="fas fa-boxes me-2"></i> المشتريات (توريد)
         </a>
+        {% endif %}
+
         <a href="{% url 'patient_list' %}" class="{% if request.resolver_match.url_name == 'patient_list' %}active{% endif %}">
             <i class="fas fa-users me-2"></i> المرضى
         </a>
         <a href="{% url 'prescription_list' %}" class="{% if request.resolver_match.url_name == 'prescription_list' %}active{% endif %}">
             <i class="fas fa-prescription me-2"></i> الوصفات الطبية
         </a>
+
+        {% if user.profile.role == 'Admin' %}
         <a href="{% url 'reports_view' %}" class="{% if request.resolver_match.url_name == 'reports_view' %}active{% endif %}">
             <i class="fas fa-chart-line me-2"></i> التقارير والأرباح
         </a>
+        <a href="{% url 'system_settings' %}" class="{% if request.resolver_match.url_name == 'system_settings' %}active{% endif %}">
+            <i class="fas fa-cog me-2"></i> إعدادات النظام
+        </a>
+        {% endif %}
         <hr>
         <a href="{% url 'logout' %}">
             <i class="fas fa-sign-out-alt me-2"></i> تسجيل الخروج

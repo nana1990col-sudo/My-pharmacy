@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card p-4 mx-auto" style="max-width: 900px;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="card-title mb-0"><i class="fas fa-prescription me-2 text-primary"></i> {{ title }}</h5>
+            <a href="{% url 'prescription_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-right me-2"></i> العودة للقائمة
+            </a>
+        </div>
+        <hr>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.patient|as_crispy_field }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.doctor_name|as_crispy_field }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.date|as_crispy_field }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.is_dispensed|as_crispy_field }}
+                </div>
+                <div class="col-12 mb-3">
+                    {{ form.notes|as_crispy_field }}
+                </div>
+            </div>
+
+            <h5 class="mt-4 mb-3"><i class="fas fa-pills me-2 text-success"></i> الأدوية المطلوبة</h5>
+            <div id="formset-container">
+                {{ formset.management_form }}
+                {% for form in formset %}
+                <div class="row drug-form border rounded p-3 mb-3 bg-light">
+                    <div class="col-md-6">
+                        {{ form.drug|as_crispy_field }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.quantity|as_crispy_field }}
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end mb-3">
+                        {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
+                        <button type="button" class="btn btn-outline-danger remove-form">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    {% for hidden in form.hidden_fields %}
+                        {{ hidden }}
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+            
+            <button type="button" id="add-form" class="btn btn-outline-primary mb-4">
+                <i class="fas fa-plus me-2"></i> إضافة دواء آخر
+            </button>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary btn-lg px-5">
+                    <i class="fas fa-save me-2"></i> حفظ الوصفة
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.querySelector('#formset-container');
+        const addButton = document.querySelector('#add-form');
+        const totalForms = document.querySelector('#id_items-TOTAL_FORMS');
+
+        addButton.addEventListener('click', function() {
+            const forms = container.querySelectorAll('.drug-form');
+            const formCount = forms.length;
+            const newForm = forms[0].cloneNode(true);
+            
+            // Clear inputs
+            newForm.querySelectorAll('input, select').forEach(input => {
+                input.value = '';
+                if (input.name) {
+                    input.name = input.name.replace('-0-', `-${formCount}-`);
+                    input.id = input.id.replace('-0-', `-${formCount}-`);
+                }
+            });
+
+            // Update labels
+            newForm.querySelectorAll('label').forEach(label => {
+                if (label.getAttribute('for')) {
+                    label.setAttribute('for', label.getAttribute('for').replace('-0-', `-${formCount}-`));
+                }
+            });
+
+            container.appendChild(newForm);
+            totalForms.value = formCount + 1;
+        });
+
+        container.addEventListener('click', function(e) {
+            if (e.target.closest('.remove-form')) {
+                const forms = container.querySelectorAll('.drug-form');
+                if (forms.length > 1) {
+                    e.target.closest('.drug-form').remove();
+                    // Update total forms
+                    totalForms.value = container.querySelectorAll('.drug-form').length;
+                } else {
+                    alert('يجب وجود دواء واحد على الأقل في الوصفة');
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

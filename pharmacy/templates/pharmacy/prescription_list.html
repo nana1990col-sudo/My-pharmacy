@@ -17,6 +17,7 @@
                         <th>التاريخ</th>
                         <th>المريض</th>
                         <th>اسم الطبيب</th>
+                        <th>الأدوية والكميات</th>
                         <th>الحالة</th>
                         <th>الإجراء</th>
                     </tr>
@@ -27,6 +28,13 @@
                         <td>{{ prescription.date }}</td>
                         <td class="fw-bold">{{ prescription.patient.name }}</td>
                         <td>{{ prescription.doctor_name }}</td>
+                        <td class="text-start">
+                            <ul class="mb-0 list-unstyled small">
+                            {% for item in prescription.items.all %}
+                                <li><i class="fas fa-pills me-1 text-muted"></i> {{ item.drug.trade_name }} ({{ item.quantity }})</li>
+                            {% endfor %}
+                            </ul>
+                        </td>
                         <td>
                             {% if prescription.is_dispensed %}
                                 <span class="badge bg-success">تم الصرف</span>
@@ -35,13 +43,18 @@
                             {% endif %}
                         </td>
                         <td>
-                            <button class="btn btn-sm btn-outline-primary">
-                                <i class="fas fa-eye me-1"></i> عرض التفاصيل
-                            </button>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-primary" title="عرض">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-info" title="طباعة">
+                                    <i class="fas fa-print"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="5" class="text-center py-4 text-muted">لا توجد وصفات مسجلة</td></tr>
+                    <tr><td colspan="6" class="text-center py-4 text-muted">لا توجد وصفات مسجلة</td></tr>
                     {% endfor %}
                 </tbody>
             </table>

@@ -2,8 +2,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Sum, Count, Q, F
 from django.utils import timezone
-from .models import Drug, Category, Supplier, Patient, Prescription, Sale, SaleItem, Purchase, UserProfile
-from .forms import DrugForm, CategoryForm, SupplierForm, PatientForm, PrescriptionForm, PurchaseForm
+from .models import Drug, Category, Supplier, Patient, Prescription, PrescriptionItem, Sale, SaleItem, Purchase, UserProfile, SystemSettings
+from .forms import DrugForm, CategoryForm, SupplierForm, PatientForm, PrescriptionForm, PurchaseForm, SystemSettingsForm, PrescriptionItemFormSet
+
 import json
 from django.http import JsonResponse
 from decimal import Decimal
@@ -100,13 +101,19 @@ def process_sale_ajax(request):
         items = data.get('items', [])
         discount = Decimal(data.get('discount', 0))
         payment_method = data.get('payment_method', 'Cash')
+        patient_id = data.get('patient_id')
         
         if not items:
             return JsonResponse({'error': 'No items in sale'}, status=400)
             
+        patient = None
+        if patient_id:
+            patient = get_object_or_404(Patient, id=patient_id)
+            
         total_amount = 0
         sale = Sale.objects.create(
             cashier=request.user,
+            patient=patient,
             discount=discount,
             payment_method=payment_method
         )
@@ -199,7 +206,20 @@ def purchase_add(request):
 @login_required
 def patient_list(request):
     patients = Patient.objects.all()
+    if request.GET.get('json'):
+        return JsonResponse(list(patients.values('id', 'name', 'phone')), safe=False)
     return render(request, 'pharmacy/patient_list.html', {'patients': patients})
+
+@login_required
+def patient_add(request):
+    if request.method == 'POST':
+        form = PatientForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('patient_list')
+    else:
+        form = PatientForm()
+    return render(request, 'pharmacy/generic_form.html', {'form': form, 'title': 'إضافة مريض جديد'})
 
 @login_required
 def prescription_list(request):
@@ -210,9 +230,30 @@ def prescription_list(request):
 def prescription_add(request):
     if request.method == 'POST':
         form = PrescriptionForm(request.POST)
-        if form.is_valid():
-            form.save()
+        formset = PrescriptionItemFormSet(request.POST)
+        if form.is_valid() and formset.is_valid():
+            prescription = form.save()
+            formset.instance = prescription
+            formset.save()
             return redirect('prescription_list')
     else:
         form = PrescriptionForm()
-    return render(request, 'pharmacy/generic_form.html', {'form': form, 'title': 'إضافة وصفة طبية'})
+        formset = PrescriptionItemFormSet()
+    return render(request, 'pharmacy/prescription_form.html', {
+        'form': form,
+        'formset': formset,
+        'title': 'إضافة وصفة طبية'
+    })
+
+@login_required
+@user_passes_test(is_admin)
+def system_settings_view(request):
+    settings = SystemSettings.get_settings()
+    if request.method == 'POST':
+        form = SystemSettingsForm(request.POST, instance=settings)
+        if form.is_valid():
+            form.save()
+            return redirect('dashboard')
+    else:
+        form = SystemSettingsForm(instance=settings)
+    return render(request, 'pharmacy/generic_form.html', {'form': form, 'title': 'إعدادات النظام'})

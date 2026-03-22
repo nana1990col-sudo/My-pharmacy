@@ -105,6 +105,34 @@ class Prescription(models.Model):
     def __str__(self):
         return f"وصفة {self.patient.name} - {self.date}"
 
+class PrescriptionItem(models.Model):
+    prescription = models.ForeignKey(Prescription, related_name='items', on_delete=models.CASCADE)
+    drug = models.ForeignKey(Drug, on_delete=models.CASCADE, verbose_name="الدواء")
+    quantity = models.PositiveIntegerField(default=1, verbose_name="الكمية")
+
+    class Meta:
+        verbose_name = "دواء في الوصفة"
+        verbose_name_plural = "أدوية في الوصفات"
+
+class SystemSettings(models.Model):
+    pharmacy_name = models.CharField(max_length=200, default="صيدليتي الذكية", verbose_name="اسم الصيدلية")
+    currency_unit = models.CharField(max_length=20, default="ج.م", verbose_name="الوحدة السعرية (العملة)")
+    tax_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0, verbose_name="نسبة الضريبة (%)")
+    address = models.TextField(blank=True, verbose_name="عنوان الصيدلية")
+    phone = models.CharField(max_length=20, blank=True, verbose_name="هاتف الصيدلية")
+
+    class Meta:
+        verbose_name = "إعدادات النظام"
+        verbose_name_plural = "إعدادات النظام"
+
+    def __str__(self):
+        return "إعدادات النظام"
+
+    @classmethod
+    def get_settings(cls):
+        settings, created = cls.objects.get_or_create(id=1)
+        return settings
+
 class Sale(models.Model):
     PAYMENT_METHODS = [
         ('Cash', 'نقدي'),
